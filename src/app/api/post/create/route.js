@@ -1,20 +1,17 @@
 import Post from '../../../../lib/models/post.model.js';
 import { connect } from '../../../../lib/mongodb/mongoose.js';
-//import { currentUser } from '@clerk/nextjs/server';
-import { auth } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 
 export const POST = async (req) => {
-   //const user = await currentUser();
+   
    try {
      await connect();
-     const { userId } = auth();
-     if (!userId) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
-      }
+    
+     const user = await currentUser();
      const data = await req.json();
      
      if (
-     //  !user ||
+       !user ||
        user.publicMetadata.userMongoId !== data.userMongoId ||
        user.publicMetadata.isAdmin !== true
      ) {
@@ -35,7 +32,6 @@ export const POST = async (req) => {
        category: data.category,
        slug,
      });
-     //await newPost.save();
      return new Response(JSON.stringify(newPost), {
        status: 201,
      });
