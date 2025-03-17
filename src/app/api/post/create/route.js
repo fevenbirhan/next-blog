@@ -1,11 +1,16 @@
 import Post from '../../../../lib/models/post.model.js';
 import { connect } from '../../../../lib/mongodb/mongoose.js';
-import { currentUser } from '@clerk/nextjs/server';
+import { currentUser, auth } from '@clerk/nextjs/server';
 
 export const POST = async (req) => {
    
    try {
      await connect();
+
+     const { userId } = await auth();
+     if (!userId) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+     }
     
      const user = await currentUser();
      const data = await req.json();
@@ -33,7 +38,7 @@ export const POST = async (req) => {
        slug,
      });
      return new Response(JSON.stringify(newPost), {
-       status: 201,
+       status: 200,
      });
     } catch (error) {
      console.log('Error creating post:', error);
