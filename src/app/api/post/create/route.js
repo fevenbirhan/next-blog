@@ -6,13 +6,19 @@ export const POST = async (req) => {
    
    try {
      await connect();
-
+     console.log('✅ DB connected, attempting to create post');
+     
      const { userId } = await auth();
      if (!userId) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
      }
-    
+     
      const user = await currentUser();
+     console.log('currentUser() output:', user); // Add this line!
+
+     if (!user) {
+        console.error("currentUser() returned null or undefined");
+     }
      const data = await req.json();
      
      if (
@@ -37,8 +43,9 @@ export const POST = async (req) => {
        category: data.category,
        slug,
      });
+     await newPost.save();
      return new Response(JSON.stringify(newPost), {
-       status: 200,
+       status: 201,
      });
     } catch (error) {
      console.log('Error creating post:', error);
