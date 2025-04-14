@@ -17,7 +17,7 @@
  export default function CreatePostPage() {
    const { isSignedIn, user, isLoaded } = useUser();
    const [file, setFile] = useState(null);
-   const [imageUploadProgress, setImageUploadProgress] = useState(null);
+   const [uploading, setUploading] = useState(false);
    const [imageUploadError, setImageUploadError] = useState(null);
    const [formData, setFormData] = useState({});
    const [publishError, setPublishError] = useState(null);
@@ -31,9 +31,9 @@
             return;
         }
         setImageUploadError(null);
-        
+        setUploading(true);
+
         const fileName = `${new Date().getTime()}-${file.name}`;
-        setImageUploadProgress(0);
         
         const { data, error } = await supabase.storage.from('next-blog').upload(fileName, file, {
             cacheControl: '3600',
@@ -45,12 +45,13 @@
         }
         
         const { data: urlData } = await supabase.storage.from('next-blog').getPublicUrl(fileName);
-        setImageUploadProgress(null);
+        
+        setUploading(false);
         setImageUploadError(null);
         setFormData({ ...formData, image: urlData.publicUrl });
         } catch (error) {
         setImageUploadError('Image upload failed');
-        setImageUploadProgress(null);
+        setUploading(false);
         console.error(error);
         }
     };
@@ -127,18 +128,9 @@
                size='sm'
                outline
                onClick={handleUploadImage}
-               disabled={imageUploadProgress}
+               disabled={uploading}
              >
-                {imageUploadProgress ? (
-                 <div className='w-16 h-16'>
-                   <CircularProgressbar
-                     value={imageUploadProgress}
-                     text={`${imageUploadProgress || 0}%`}
-                   />
-                 </div>
-                ) : (
-                 'Upload Image'
-                )}
+                {uploading ? 'Uploading...' : 'Upload Image'}
              </Button>
            </div>
 
