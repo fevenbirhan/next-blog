@@ -33,12 +33,6 @@ export default async function Home() {
            </a>
            .
          </p>
-         <Link
-           href='/search'
-           className='text-xs sm:text-sm text-teal-500 font-bold hover:underline'
-         >
-           View all posts
-         </Link>
        </div>
        <div className='p-3 bg-amber-100 dark:bg-slate-700'>
          <CallToAction />
